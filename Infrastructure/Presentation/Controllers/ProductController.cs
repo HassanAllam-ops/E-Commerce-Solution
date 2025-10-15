@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ServiceAbstraction;
+using Shared;
 using Shared.DataTransferObjects;
 
 namespace Presentation.Controllers
@@ -16,9 +17,13 @@ namespace Presentation.Controllers
         // Get All Products
         [HttpGet]
         // GET: baseUrl/api/Products
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetAllProducts()
+        // Name Asc
+        // Name Desc
+        // Price Asc
+        // Price Desc
+        public async Task<ActionResult<PaginatedResult<ProductDto>>> GetAllProducts([FromQuery]ProductQueryParams queryParams)
         {
-            var products = await _serviceManager.ProductService.GetAllProductsAsync();
+            var products = await _serviceManager.ProductService.GetAllProductsAsync(queryParams);
             return Ok(products);
         }
         //Get Products by Id
