@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
 using Shared.DataTransferObjects;
 
 namespace ServiceAbstraction
@@ -10,7 +11,7 @@ namespace ServiceAbstraction
     public interface IProductService
     {
         // Get all products
-        Task<IEnumerable<ProductDto>> GetAllProductsAsync();
+        Task<PaginatedResult<ProductDto>> GetAllProductsAsync(ProductQueryParams queryParams);
         // Get product by id
         Task<ProductDto?> GetProductByIdAsync(int id);
         // Get All Brands
