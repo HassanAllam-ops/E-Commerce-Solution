@@ -1,5 +1,11 @@
 
+using System.Threading.Tasks;
+using Azure;
 using DomainLayer.Contracts;
+using E_Commerce.Web.CustomMiddleWares;
+using E_Commerce.Web.Extensions;
+using E_Commerce.Web.Factories;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Data.Contexts;
@@ -7,12 +13,13 @@ using Persistence.Repositories;
 using ServiceAbstraction;
 using Services;
 using Services.MappingProfiles;
+using Shared.ErrorModels;
 
 namespace E_Commerce.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -21,36 +28,29 @@ namespace E_Commerce.Web
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-            builder.Services.AddDbContext<StoreDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
-
-            builder.Services.AddScoped<IDataSeeding, DataSeeding>();
-            builder.Services.AddScoped<IUintOfWork, UnitOfWork>();
-            builder.Services.AddAutoMapper(config => config.AddProfile(new ProductProfile()), typeof(Services.AssemblyReference).Assembly);
-            builder.Services.AddScoped<IServiceManager, ServiceManager>();
+            builder.Services.AddSwaggerServices();
+            builder.Services.AddInfrastructureService(builder.Configuration);
+            builder.Services.AddApplicationServices();
+            builder.Services.AddWebApplicationServices();
             #endregion
 
             var app = builder.Build();
 
-            #region Data Seeding
-            var Scope = app.Services.CreateScope();
-
-            var Seed = Scope.ServiceProvider.GetRequiredService<IDataSeeding>();
-
-            Seed.DataSeedAsync();
-            #endregion
+            await app.SeedDataAsync();
 
             #region Configure the HTTP request pipeline
             // Configure the HTTP request pipeline.
+            ///app.Use(async (RequestContext, NextMiddleware) =>
+            ///{
+            ///    Console.WriteLine("Request Under Processing");
+            ///    await NextMiddleware.Invoke();
+            ///    Console.WriteLine("Waiting Processing");
+            ///    Console.WriteLine(RequestContext.Response.Body);
+            ///});
+            app.UseCustomExceptionMiddleware();
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerMiddlewares();
             }
 
             app.UseHttpsRedirection();
