@@ -16,7 +16,7 @@ namespace Persistence.Repositories
         public async Task<Basket?> CreateOrUpdateBasketAsync(Basket basket, TimeSpan? TimeToLive = null)
         {
             var JsonBasket = JsonSerializer.Serialize(basket);
-            var IsCreatedOrUpdated = await _database.StringSetAsync(basket.Id, JsonBasket, TimeToLive ?? TimeSpan.FromDays(30));
+            var IsCreatedOrUpdated = await _database.StringSetAsync(basket.Id, JsonBasket, TimeToLive ?? TimeSpan.FromDays(3));
             if (IsCreatedOrUpdated)
                 return await GetBasketAsync(basket.Id);
             return null;
