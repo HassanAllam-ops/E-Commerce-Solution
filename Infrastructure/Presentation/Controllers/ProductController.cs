@@ -4,16 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Presentation.Attributes;
 using ServiceAbstraction;
 using Shared;
 using Shared.DataTransferObjects.ProductModule;
+using Shared.ErrorModels;
 
 namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")] // baseUrl: api/Products
-    public class ProductController(IServiceManager _serviceManager) : ControllerBase
+    public class ProductController([FromKeyedServices("FactoryDelegate")]IServiceManager _serviceManager) : ControllerBase
     {
         // Get All Products
         [Authorize(Roles = "Admin")]
@@ -23,12 +27,16 @@ namespace Presentation.Controllers
         // Name Desc
         // Price Asc
         // Price Desc
+        [Cache(300)]
         public async Task<ActionResult<PaginatedResult<ProductDto>>> GetAllProducts([FromQuery]ProductQueryParams queryParams)
         {
             var products = await _serviceManager.ProductService.GetAllProductsAsync(queryParams);
             return Ok(products);
         }
+
         //Get Products by Id
+        [ProducesResponseType(typeof(ProductDto) , StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorToReturn) , StatusCodes.Status404NotFound)]
         [HttpGet("{id:int}")]
         // GET: baseUrl/api/Products/id
         public async Task<ActionResult<ProductDto>> GetProduct(int id)
