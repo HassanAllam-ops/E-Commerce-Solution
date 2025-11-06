@@ -17,7 +17,7 @@ namespace Services
             //Services.AddScoped<IServiceManager, ServiceManagerWithFactoryDelegate>();
             //Services.AddScoped<IServiceManager, ServiceManager>();
 
-            Services.AddKeyedScoped<IServiceManager, ServiceManager>("Lazy");
+            Services.AddScoped<IServiceManager, ServiceManager>();
             //Services.AddKeyedScoped<IServiceManager, ServiceManagerWithFactoryDelegate>("FactoryDelegate");
 
             Services.AddScoped<IProductService, ProductService>();   
