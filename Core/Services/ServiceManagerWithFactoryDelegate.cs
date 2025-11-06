@@ -10,7 +10,7 @@ namespace Services
     internal class ServiceManagerWithFactoryDelegate(Func<IProductService> ProductFactory,
                                           Func<IBasketService> BasketFactory,
                                           Func<IAuthenticationService> AuthenticationFactory,
-                                          Func<IOrderService> OrderFactory) : IServiceManager
+                                          Func<IOrderService> OrderFactory)
     {
         public IProductService ProductService => ProductFactory.Invoke();
 
